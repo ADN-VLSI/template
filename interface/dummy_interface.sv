@@ -1,0 +1,2 @@
+interface dummy_interface;
+endinterface

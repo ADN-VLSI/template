@@ -1,0 +1,73 @@
+name: CICD
+
+on: [push]
+
+jobs:
+  CICD:
+    runs-on: [adn]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.ADN_SECRET_FOEZ_PAT }}
+
+      - name: Process tagged files
+        id: tagged-files
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.ADN_SECRET_FOEZ_PAT }}
+          KEY_0: ${{ secrets.FOEZ_API_KEY_0 }}
+          KEY_1: ${{ secrets.FOEZ_API_KEY_1 }}
+          KEY_2: ${{ secrets.FOEZ_API_KEY_2 }}
+          KEY_3: ${{ secrets.FOEZ_API_KEY_3 }}
+          INDEX: ${{ vars.KEY_INDEX }}
+        run: |
+          directive_regex='^[[:space:]]*(//|#|--|/\*+|\*+)?[[:space:]]*@foez-bhai\b'
+          workflow_file="./.github/workflows/foez-bhai-tag.yml"
+          KEYS=("$KEY_0" "$KEY_1" "$KEY_2" "$KEY_3")
+          CURRENT_INDEX=$(( ${INDEX:-0} % 4 ))
+          mapfile -d '' files < <(
+            grep -RIlZ --exclude-dir=.git --exclude-dir=.github --exclude-dir=document --exclude-dir=submodule -E "$directive_regex" . |
+              while IFS= read -r -d '' file; do
+                if [ "$file" != "$workflow_file" ]; then
+                  printf '%s\0' "$file"
+                fi
+              done || true
+          )
+          if [ "${#files[@]}" -gt 0 ]; then
+            printf '%s\0' "${files[@]}" > tagged-files.txt
+            while IFS= read -r -d '' file; do
+              API_KEY="${KEYS[$CURRENT_INDEX]}"
+              echo "::add-mask::$API_KEY"
+              python .github/gemini.py "$file" --api-key "$API_KEY" -o output.foez
+              mv output.foez "$file"
+              echo "" >> "$file"
+              rm -rf __pycache__
+              CURRENT_INDEX=$(( (CURRENT_INDEX + 1) % 4 ))
+              gh variable set KEY_INDEX --body "$CURRENT_INDEX" --repo "${{ github.repository }}"
+            done < tagged-files.txt
+          fi
+          rm -rf tagged-files.txt
+
+      - name: Update Documentations & Lists
+        shell: bash
+        run: |
+          git submodule update --init --depth 1 submodule/documenter
+          make update_doc_list
+
+      - name: Commit and push changes
+        shell: bash
+        run: |
+          git config user.name "Foez Ahmed"
+          git config user.email "foez.official@gmail.com"
+          git add .
+          git restore --staged submodule
+          git commit -m "auto-update" || make regression
+          git push origin HEAD
+
+      - name: Fail if regression issues
+        shell: bash
+        run: |
+          touch ./log/ci_issues.log
+          [[ -s ./log/ci_issues.log ]] && exit 1 || exit 0
