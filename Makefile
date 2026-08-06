@@ -212,7 +212,10 @@ compile_submodule:
 
 .PHONY: regression
 regression:
-	@./.github/regression.sh
+	@$(foreach f,$(wildcard wcfg/*.gtkw),sed -i 's#\\\\#/#g' "$(f)";)
+	@$(foreach f,$(wildcard wcfg/*.gtkw),sed -i 's|^\[dumpfile\] .*/build/|\[dumpfile\] "build/|' "$(f)";)
+	@$(foreach f,$(wildcard wcfg/*.gtkw),sed -i 's|^\[savefile\] .*/wcfg/|\[savefile\] "wcfg/|' "$(f)";)
+# 	@./.github/regression.sh
 
 ####################################################################################################
 # UPDATE DOC LIST
