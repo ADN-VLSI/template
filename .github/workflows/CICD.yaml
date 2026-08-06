@@ -21,12 +21,16 @@ jobs:
           KEY_1: ${{ secrets.FOEZ_API_KEY_1 }}
           KEY_2: ${{ secrets.FOEZ_API_KEY_2 }}
           KEY_3: ${{ secrets.FOEZ_API_KEY_3 }}
+          # KEY_4: ${{ secrets.FOEZ_API_KEY_4 }}
+          KEY_5: ${{ secrets.FOEZ_API_KEY_5 }}
+          KEY_6: ${{ secrets.FOEZ_API_KEY_6 }}
+          KEY_7: ${{ secrets.FOEZ_API_KEY_7 }}
           INDEX: ${{ vars.KEY_INDEX }}
         run: |
           directive_regex='^[[:space:]]*(//|#|--|/\*+|\*+)?[[:space:]]*@foez-bhai\b'
           workflow_file="./.github/workflows/foez-bhai-tag.yml"
-          KEYS=("$KEY_0" "$KEY_1" "$KEY_2" "$KEY_3")
-          CURRENT_INDEX=$(( ${INDEX:-0} % 4 ))
+          KEYS=("$KEY_0" "$KEY_1" "$KEY_2" "$KEY_3" "$KEY_5" "$KEY_6" "$KEY_7")
+          CURRENT_INDEX=$(( ${INDEX:-0} % 7 ))
           mapfile -d '' files < <(
             grep -RIlZ --exclude-dir=.git --exclude-dir=.github --exclude-dir=document --exclude-dir=submodule -E "$directive_regex" . |
               while IFS= read -r -d '' file; do
@@ -40,11 +44,12 @@ jobs:
             while IFS= read -r -d '' file; do
               API_KEY="${KEYS[$CURRENT_INDEX]}"
               echo "::add-mask::$API_KEY"
+              echo "Processing file: $file with API_KEY index: $CURRENT_INDEX"
               python .github/gemini.py "$file" --api-key "$API_KEY" -o output.foez
               mv output.foez "$file"
               echo "" >> "$file"
               rm -rf __pycache__
-              CURRENT_INDEX=$(( (CURRENT_INDEX + 1) % 4 ))
+              CURRENT_INDEX=$(( (CURRENT_INDEX + 1) % 7 ))
               gh variable set KEY_INDEX --body "$CURRENT_INDEX" --repo "${{ github.repository }}"
             done < tagged-files.txt
           fi

@@ -1,5 +1,7 @@
 export SHELL=/bin/bash
 
+.DEFAULT_GOAL := help
+
 include ext.mk
 
 ####################################################################################################
@@ -14,13 +16,12 @@ BUILD_DIR := $(REPO_ROOT)/build
 LOG_DIR := $(REPO_ROOT)/log
 COVERAGE_DIR := $(REPO_ROOT)/coverage
 DOCUMENTER := $(REPO_ROOT)/submodule/documenter
-SOURCE_DOC_DIR := $(REPO_ROOT)/document/source
 
 TN    := default
-TC    := 1
-GUI   := 0
+TC    := 0
 VCD   := 0
 DEBUG := 0
+GUI   := 0
 
 ####################################################################################################
 # Tools
@@ -46,6 +47,39 @@ LINE_4 := See LICENSE file in the project root for full license information
 ####################################################################################################
 # VIVADO
 ####################################################################################################
+
+.PHONY: help
+help:
+	@clear
+	@echo ""
+	@echo -e "    \033[1;32m# Shows this help message\033[0m"
+	@echo -e "    \033[0;33mmake\033[0m \033[0;36mhelp\033[0m"
+	@echo ""
+	@echo -e "    \033[1;32m# Create Design Source from Template\033[0m"
+	@echo -e "    \033[0;33mmake\033[0m \033[0;36mgen_source\033[0m RTL=\033[0;35m<design_module_name>\033[0m"
+	@echo ""
+	@echo -e "    \033[1;32m# Create Testbench from Template\033[0m"
+	@echo -e "    \033[0;33mmake\033[0m \033[0;36mgen_testbench\033[0m RTL=\033[0;35m<top_module_name>\033[0m"
+	@echo ""
+	@echo -e "    \033[1;32m# Run simulation for a selected top module and test case, etc.\033[0m"
+	@echo -e "    \033[1;32m# The arguments are passed to the testbench to as follows:\033[0m"
+	@echo -e "    \033[0;32m#   TOP   : string top_name;     // TESTBENCH TOP MODULE NAME\033[0m"
+	@echo -e "    \033[0;32m#   TN    : string test_name;    // TEST CASE NAME\033[0m"
+	@echo -e "    \033[0;32m#   TC    : int    test_count;   // REPEAT COUNT\033[0m"
+	@echo -e "    \033[0;32m#   VCD   : int    vcd;          // GENERATE VCD FILE\033[0m"
+	@echo -e "    \033[0;32m#   DEBUG : int    debug;        // ENABLE DEBUG MODE\033[0m"
+	@echo -e "    \033[1;32m# GUI : Run simulation in GUI mode\033[0m"
+	@echo -e "    \033[0;33mmake\033[0m \033[0;36msimulate\033[0m TOP=\033[0;35m<top_module_name>\033[0m TN=\033[0;35m<test_case_name>\033[0m TC=\033[0;35m<int>\033[0m VCD=\033[0;35m<int>\033[0m DEBUG=\033[0;35m<int>\033[0m GUI=\033[0;35m<0|1>\033[0m"
+	@echo ""
+	@echo -e "    \033[1;32m# Clean build directory\033[0m"
+	@echo -e "    \033[0;33mmake\033[0m \033[0;36mclean\033[0m"
+	@echo ""
+	@echo -e "    \033[1;32m# Clean build, log and coverage directories\033[0m"
+	@echo -e "    \033[0;33mmake\033[0m \033[0;36mclean_full\033[0m"
+	@echo ""
+	@echo -e "    \033[1;32m# Run Regression\033[0m"
+	@echo -e "    \033[0;33mmake\033[0m \033[0;36mregression\033[0m"
+	@echo ""
 
 $(BUILD_DIR) $(LOG_DIR) $(COVERAGE_DIR):
 	@echo -e "\033[1;33m#\033[0m Creating directory $@"
@@ -132,7 +166,12 @@ compile_this_module:
 $(BUILD_DIR)/xelab_$(TOP):
 	@echo -e "\033[1;33m#\033[0m Elaborating $(TOP)"
 	@cd $(BUILD_DIR) && $(XELAB) $(TOP) -s snap_$(TOP) -debug all -log $(LOG_DIR)/xelab_$(TOP)_$(shell date +%Y%m%d_%H%M%S).log $(O_EW)
-	@echo "" > $(BUILD_DIR)/xelab_$(TOP)
+	@if [ $$? -ne 0 ]; then \
+		echo -e "\033[1;31m#\033[0m Elaboration failed, check log file $(LOG_DIR)/xelab_$(TOP)_$(shell date +%Y%m%d_%H%M%S).log"; \
+		exit 1; \
+	else \
+		echo "" > $(BUILD_DIR)/xelab_$(TOP); \
+	fi
 
 .PHONY: __ENV_BUILD__
 __ENV_BUILD__:
@@ -185,20 +224,41 @@ update_doc_list:
 	@make -s create_all_docs
 	@cat readme_base.md > readme.md
 	@echo "" >> readme.md
-	@echo "## RTL" >> readme.md
-	@$(foreach file, $(shell find $(SOURCE_DOC_DIR) -name "*.md"), make -s get_source_doc_header FILE=$(file);)
+	@echo "## SOURCE" >> readme.md
+	@$(foreach file, $(shell find $(REPO_ROOT)/document/source -name "*.md" | sort), make -s get_source_doc_header FILE=$(file);)
+	@echo "" >> readme.md
+	@$(foreach file, $(shell find $(REPO_ROOT)/submodule/ -wholename "$(REPO_ROOT)/submodule/*/document/source/*.md" | sort), make -s get_source_doc_header FILE=$(file);)
+	@echo "" >> readme.md
+	@echo "## INTERFACE" >> readme.md
+	@$(foreach file, $(shell find $(REPO_ROOT)/document/interface -name "*.md" | sort), make -s get_source_doc_header FILE=$(file);)
+	@echo "" >> readme.md
+	@$(foreach file, $(shell find $(REPO_ROOT)/submodule/ -wholename "$(REPO_ROOT)/submodule/*/document/interface/*.md" | sort), make -s get_source_doc_header FILE=$(file);)
+	@echo "" >> readme.md
+	@echo "## INCLUDE" >> readme.md
+	@$(foreach file, $(shell find $(REPO_ROOT)/document/include -name "*.md" | sort), make -s get_source_doc_header FILE=$(file);)
+	@echo "" >> readme.md
+	@$(foreach file, $(shell find $(REPO_ROOT)/submodule/ -wholename "$(REPO_ROOT)/submodule/*/document/include/*/*.md" | sort), make -s get_source_doc_header FILE=$(file);)
+	@perl -pi -e 's|submodule/([^/]+)|https://github.com/ADN-VLSI/$$1/blob/main|g' readme.md
+	@echo "" >> readme.md
+	@echo "---" >> readme.md
+	@echo "" >> readme.md
+	@echo '<span style="font-size: 1.3em; font-weight: bold;"> <a href="https://github.com/squared-studio/documenter/blob/main/README.md">Coding & Commenting Guidelines</a></span>' >> readme.md
 	@echo "" >> readme.md
 
 .PHONY: create_all_docs
 create_all_docs:
 	@make -s clean_all_docs
-	@$(foreach file, $(shell find $(REPO_ROOT)/source/ -type f -name "*.sv"), make -s gen_doc FILE=$(file);)
+	@$(foreach file, $(shell find $(REPO_ROOT)/include/ -type f -name "*.*v*"), make -s gen_doc FILE=$(file) FOLDER=include;)
+	@$(foreach file, $(shell find $(REPO_ROOT)/interface/ -type f -name "*.sv"), make -s gen_doc FILE=$(file) FOLDER=interface;)
+	@$(foreach file, $(shell find $(REPO_ROOT)/source/ -type f -name "*.sv"), make -s gen_doc FILE=$(file) FOLDER=source;)
 
 .PHONY: clean_all_docs
 clean_all_docs:
-	@mkdir -p $(SOURCE_DOC_DIR)
-	@rm -f $(SOURCE_DOC_DIR)/*.md
-	@rm -f $(SOURCE_DOC_DIR)/*_top.svg
+	@mkdir -p $(REPO_ROOT)/document/source
+	@rm -rf $(REPO_ROOT)/document/include
+	@rm -rf $(REPO_ROOT)/document/interface
+	@rm -f $(REPO_ROOT)/document/source/*.md
+	@rm -f $(REPO_ROOT)/document/source/*_top.svg
 
 .PHONY: get_source_doc_header
 get_source_doc_header:
@@ -210,11 +270,18 @@ get_source_doc_header:
 .PHONY: gen_doc
 gen_doc:
 	@echo "Creating document for $(FILE)"
-	@$(PYTHON) $(DOCUMENTER)/sv_documenter.py $(FILE) $(SOURCE_DOC_DIR)
-	@sed -i "s|.*${LINE_1}.*|<br>**${LINE_1}**|g" $(SOURCE_DOC_DIR)/$(shell basename $(FILE) | sed "s/\.sv/\.md/g")
-	@sed -i "s|.*${LINE_2}.*|<br>**${LINE_2}**|g" $(SOURCE_DOC_DIR)/$(shell basename $(FILE) | sed "s/\.sv/\.md/g")
-	@sed -i "s|.*${LINE_3}.*|<br>**${LINE_3}**|g" $(SOURCE_DOC_DIR)/$(shell basename $(FILE) | sed "s/\.sv/\.md/g")
-	@sed -i "s|.*${LINE_4}.*|<br>**${LINE_4}**|g" $(SOURCE_DOC_DIR)/$(shell basename $(FILE) | sed "s/\.sv/\.md/g")
+	@$(eval OUTPUT_DIR := $(shell dirname $(FILE) | sed 's|$(REPO_ROOT)/$(FOLDER)|$(REPO_ROOT)/document/$(FOLDER)|g'))
+	@$(eval OUTPUT_FILE := $(shell basename $(FILE) | sed "s/\..*/\.md/g"))
+	@$(eval REMAINING_PATH := $(shell echo $(FILE) | sed "s|$(REPO_ROOT)/$(FOLDER)/||g"))
+	@mkdir -p $(OUTPUT_DIR)
+	@$(PYTHON) $(DOCUMENTER)/sv_documenter.py $(FILE) $(OUTPUT_DIR)
+	@sed -i "s|.*${LINE_1}.*|<br>**${LINE_1}**|g" $(OUTPUT_DIR)/$(OUTPUT_FILE)
+	@sed -i "s|.*${LINE_2}.*|<br>**${LINE_2}**|g" $(OUTPUT_DIR)/$(OUTPUT_FILE)
+	@sed -i "s|.*${LINE_3}.*|<br>**${LINE_3}**|g" $(OUTPUT_DIR)/$(OUTPUT_FILE)
+	@sed -i "s|.*${LINE_4}.*|<br>**${LINE_4}**|g" $(OUTPUT_DIR)/$(OUTPUT_FILE)
+ifeq ($(FOLDER), include)
+	@sed -E -i "s|^# \w*|# $(REMAINING_PATH) |g" $(OUTPUT_DIR)/$(OUTPUT_FILE)
+endif
 
 ####################################################################################################
 # TESTBENCH & SOURCE GENERATION
@@ -229,6 +296,7 @@ gen_source:
 		sed -i "s|nemotron|foez---bhai|g" $(REPO_ROOT)/source/$(RTL).sv; \
 		sed -i "s|__AUTHOR_NAME__|$$(git config user.name)|g" $(REPO_ROOT)/source/$(RTL).sv; \
 		sed -i "s|__AUTHOR_EMAIL__|$$(git config user.email)|g" $(REPO_ROOT)/source/$(RTL).sv; \
+		sed -i "s|YYYY-MM-DD|$$(date +%Y-%m-%d)|g" $(REPO_ROOT)/source/$(RTL).sv; \
 		sed -i "s|squared-studio/__REPO_NAME__|ADN-VLSI/$(REPO_FILE_EXT)|g" $(REPO_ROOT)/source/$(RTL).sv; \
 		sed -i "s|__YEAR__ squared-studio|$$(date +%Y) ADN Semiconductors|g" $(REPO_ROOT)/source/$(RTL).sv; \
 		sed -i "s|source_model|$(RTL)|g" $(REPO_ROOT)/source/$(RTL).sv; \
@@ -244,9 +312,12 @@ gen_testbench:
 		sed -i "s|nemotron|foez---bhai|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
 		sed -i "s|__AUTHOR_NAME__|$$(git config user.name)|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
 		sed -i "s|__AUTHOR_EMAIL__|$$(git config user.email)|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
+		sed -i "s|YYYY-MM-DD|$$(date +%Y-%m-%d)|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
 		sed -i "s|squared-studio/__REPO_NAME__|ADN-VLSI/$(REPO_FILE_EXT)|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
 		sed -i "s|__YEAR__ squared-studio|$$(date +%Y) ADN Semiconductors|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
 		sed -i "s|testbench_model|$(TOP)|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
 		sed -i "s|tb_ess.sv|adn_common_tb_headers.sv|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
+		sed -i "s|CASE_NOTE(1.*|note_case\(1\); // THIS IS A PASS|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
+		sed -i "s|CASE_NOTE(0.*|note_case\(0\); // THIS IS A FAIL|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
 	fi
 	@code $(REPO_ROOT)/testbench/$(TOP).sv

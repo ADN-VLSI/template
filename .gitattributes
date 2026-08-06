@@ -1,0 +1,3 @@
+reuse.f merge=ours
+local.f merge=ours
+readme.md merge=ours
