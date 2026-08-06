@@ -157,7 +157,7 @@ compile_this_module:
 		echo -e "\033[1;33m#\033[0m Source files have not changed, skipping compilation."; \
 	else \
 		echo -e "\033[1;33m#\033[0m Source files have changed, recompiling..."; \
-		cd $(BUILD_DIR) && $(XVLOG) -sv -f $(REPO_ROOT)/reuse.f -f $(REPO_ROOT)/local.f -log $(LOG_DIR)/xvlog_$(shell date +%Y%m%d_%H%M%S).log $(O_EW); \
+		cd $(BUILD_DIR) && $(XVLOG) -d SIMULATION -sv -f $(REPO_ROOT)/reuse.f -f $(REPO_ROOT)/local.f -log $(LOG_DIR)/xvlog_$(shell date +%Y%m%d_%H%M%S).log $(O_EW); \
 		cp $(BUILD_DIR)/hash_new $(BUILD_DIR)/hash_old; \
 		rm -rf $(BUILD_DIR)/xelab_*; \
 	fi
