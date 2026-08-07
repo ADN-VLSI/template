@@ -15,7 +15,6 @@ REPO_ROOT := $(CURDIR)
 BUILD_DIR := $(REPO_ROOT)/build
 LOG_DIR := $(REPO_ROOT)/log
 REPORT_DIR := $(REPO_ROOT)/report
-DOCUMENTER := $(REPO_ROOT)/submodule/documenter
 
 TN    := default
 TC    := 0
@@ -245,7 +244,7 @@ update_doc_list:
 	@echo "" >> readme.md
 	@echo "---" >> readme.md
 	@echo "" >> readme.md
-	@echo '<span style="font-size: 1.3em; font-weight: bold;"> <a href="https://github.com/squared-studio/documenter/blob/main/README.md">Coding & Commenting Guidelines</a></span>' >> readme.md
+	@echo '<span style="font-size: 1.3em; font-weight: bold;"> <a href="./.github/SV_CODING_STD.md">Coding & Commenting Guidelines</a></span>' >> readme.md
 	@echo "" >> readme.md
 
 .PHONY: create_all_docs
@@ -277,7 +276,7 @@ gen_doc:
 	@$(eval OUTPUT_FILE := $(shell basename $(FILE) | sed "s/\..*/\.md/g"))
 	@$(eval REMAINING_PATH := $(shell echo $(FILE) | sed "s|$(REPO_ROOT)/$(FOLDER)/||g"))
 	@mkdir -p $(OUTPUT_DIR)
-	@$(PYTHON) $(DOCUMENTER)/sv_documenter.py $(FILE) $(OUTPUT_DIR)
+	@$(PYTHON) $(REPO_ROOT)/.github/sv_documenter.py $(FILE) $(OUTPUT_DIR)
 	@sed -i "s|.*${LINE_1}.*|<br>**${LINE_1}**|g" $(OUTPUT_DIR)/$(OUTPUT_FILE)
 	@sed -i "s|.*${LINE_2}.*|<br>**${LINE_2}**|g" $(OUTPUT_DIR)/$(OUTPUT_FILE)
 	@sed -i "s|.*${LINE_3}.*|<br>**${LINE_3}**|g" $(OUTPUT_DIR)/$(OUTPUT_FILE)
@@ -295,13 +294,12 @@ gen_source:
 # if file doesn't exist, generate it
 	@if [ ! -f $(REPO_ROOT)/source/$(RTL).sv ]; then \
 		echo -e "\033[1;33m#\033[0m Generating source for $(RTL)"; \
-		cp $(DOCUMENTER)/source.sv $(REPO_ROOT)/source/$(RTL).sv; \
-		sed -i "s|nemotron|foez---bhai|g" $(REPO_ROOT)/source/$(RTL).sv; \
+		cp $(REPO_ROOT)/.github/source.sv $(REPO_ROOT)/source/$(RTL).sv; \
 		sed -i "s|__AUTHOR_NAME__|$$(git config user.name)|g" $(REPO_ROOT)/source/$(RTL).sv; \
 		sed -i "s|__AUTHOR_EMAIL__|$$(git config user.email)|g" $(REPO_ROOT)/source/$(RTL).sv; \
 		sed -i "s|YYYY-MM-DD|$$(date +%Y-%m-%d)|g" $(REPO_ROOT)/source/$(RTL).sv; \
-		sed -i "s|squared-studio/__REPO_NAME__|ADN-VLSI/$(REPO_FILE_EXT)|g" $(REPO_ROOT)/source/$(RTL).sv; \
-		sed -i "s|__YEAR__ squared-studio|$$(date +%Y) ADN Semiconductors|g" $(REPO_ROOT)/source/$(RTL).sv; \
+		sed -i "s|ADN-VLSI/__REPO_NAME__|ADN-VLSI/$(REPO_FILE_EXT)|g" $(REPO_ROOT)/source/$(RTL).sv; \
+		sed -i "s|__YEAR__|$$(date +%Y)|g" $(REPO_ROOT)/source/$(RTL).sv; \
 		sed -i "s|source_model|$(RTL)|g" $(REPO_ROOT)/source/$(RTL).sv; \
 	fi
 	@code $(REPO_ROOT)/source/$(RTL).sv
@@ -311,16 +309,12 @@ gen_testbench:
 # if file doesn't exist, generate it
 	@if [ ! -f $(REPO_ROOT)/testbench/$(TOP).sv ]; then \
 		echo -e "\033[1;33m#\033[0m Generating testbench for $(TOP)"; \
-		cp $(DOCUMENTER)/testbench.sv $(REPO_ROOT)/testbench/$(TOP).sv; \
-		sed -i "s|nemotron|foez---bhai|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
+		cp $(REPO_ROOT)/.github/testbench.sv $(REPO_ROOT)/testbench/$(TOP).sv; \
 		sed -i "s|__AUTHOR_NAME__|$$(git config user.name)|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
 		sed -i "s|__AUTHOR_EMAIL__|$$(git config user.email)|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
 		sed -i "s|YYYY-MM-DD|$$(date +%Y-%m-%d)|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
-		sed -i "s|squared-studio/__REPO_NAME__|ADN-VLSI/$(REPO_FILE_EXT)|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
-		sed -i "s|__YEAR__ squared-studio|$$(date +%Y) ADN Semiconductors|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
+		sed -i "s|ADN-VLSI/__REPO_NAME__|ADN-VLSI/$(REPO_FILE_EXT)|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
+		sed -i "s|__YEAR__|$$(date +%Y)|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
 		sed -i "s|testbench_model|$(TOP)|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
-		sed -i "s|tb_ess.sv|adn_common_tb_headers.sv|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
-		sed -i "s|CASE_NOTE(1.*|note_case\(1\); // THIS IS A PASS|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
-		sed -i "s|CASE_NOTE(0.*|note_case\(0\); // THIS IS A FAIL|g" $(REPO_ROOT)/testbench/$(TOP).sv; \
 	fi
 	@code $(REPO_ROOT)/testbench/$(TOP).sv
