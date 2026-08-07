@@ -14,7 +14,7 @@ REPO_ROOT := $(CURDIR)
 
 BUILD_DIR := $(REPO_ROOT)/build
 LOG_DIR := $(REPO_ROOT)/log
-COVERAGE_DIR := $(REPO_ROOT)/coverage
+REPORT_DIR := $(REPO_ROOT)/report
 DOCUMENTER := $(REPO_ROOT)/submodule/documenter
 
 TN    := default
@@ -81,7 +81,7 @@ help:
 	@echo -e "    \033[0;33mmake\033[0m \033[0;36mregression\033[0m"
 	@echo ""
 
-$(BUILD_DIR) $(LOG_DIR) $(COVERAGE_DIR):
+$(BUILD_DIR) $(LOG_DIR) $(REPORT_DIR):
 	@echo -e "\033[1;33m#\033[0m Creating directory $@"
 	@mkdir -p $@
 	@echo "*" > $@/.gitignore
@@ -97,7 +97,7 @@ clean_full:
 	@echo -e "\033[1;33m#\033[0m Cleaning log directories"
 	@rm -rf $(LOG_DIR)
 	@echo -e "\033[1;33m#\033[0m Cleaning coverage directories"
-	@rm -rf $(COVERAGE_DIR)
+	@rm -rf $(REPORT_DIR)
 
 .PHONY: $(REPO_ROOT)/reuse.f
 $(REPO_ROOT)/reuse.f:
