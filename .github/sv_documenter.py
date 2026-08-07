@@ -570,8 +570,6 @@ def render_table(headers: List[str], rows: List[List[str]]) -> str:
 
 
 def render_top_io_svg(model: DocumentModel, output_dir: Path) -> None:
-    if not SVG_AVAILABLE:
-        return
     if model.kind not in {"module", "program", "interface"}:
         return
 
