@@ -42,5 +42,5 @@
 
 ---
 
-<span style="font-size: 1.3em; font-weight: bold;"> <a href="https://github.com/squared-studio/documenter/blob/main/README.md">Coding & Commenting Guidelines</a></span>
+<span style="font-size: 1.3em; font-weight: bold;"> <a href="./.github/SV_CODING_STD.md">Coding & Commenting Guidelines</a></span>
 
