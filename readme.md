@@ -28,6 +28,7 @@
 [`adn_common_xbar`](https://github.com/ADN-VLSI/adn_common/blob/main/document/source/adn_common_xbar.md)
 
 ## ASSERTION
+[`dummy_checker`](document/assertion/dummy_checker.md)
 
 
 ## INTERFACE
