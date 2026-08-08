@@ -108,6 +108,7 @@ ifeq ($(HAS_SUBMODULES), 1)
 endif
 	@find $(REPO_ROOT)/interface -maxdepth 1 -name "*.sv" >> $(REPO_ROOT)/reuse.f
 	@find $(REPO_ROOT)/source -maxdepth 1 -name "*.sv" >> $(REPO_ROOT)/reuse.f
+	@find $(REPO_ROOT)/assertion -maxdepth 1 -name "*.sv" >> $(REPO_ROOT)/reuse.f
 	@sed -i 's|$(REPO_ROOT)|$$\{$(REPO_NAME_EXP)\}|g' $(REPO_ROOT)/reuse.f
 	@sort -u $(REPO_ROOT)/reuse.f > $(REPO_ROOT)/reuse2.f
 	@mv $(REPO_ROOT)/reuse2.f $(REPO_ROOT)/reuse.f
@@ -231,6 +232,11 @@ update_doc_list:
 	@echo "" >> readme.md
 	@$(foreach file, $(shell find $(REPO_ROOT)/submodule/ -wholename "$(REPO_ROOT)/submodule/*/document/source/*.md" | sort), make -s get_source_doc_header FILE=$(file);)
 	@echo "" >> readme.md
+	@echo "## ASSERTION" >> readme.md
+	@$(foreach file, $(shell find $(REPO_ROOT)/document/assertion -name "*.md" | sort), make -s get_source_doc_header FILE=$(file);)
+	@echo "" >> readme.md
+	@$(foreach file, $(shell find $(REPO_ROOT)/submodule/ -wholename "$(REPO_ROOT)/submodule/*/document/assertion/*.md" | sort), make -s get_source_doc_header FILE=$(file);)
+	@echo "" >> readme.md
 	@echo "## INTERFACE" >> readme.md
 	@$(foreach file, $(shell find $(REPO_ROOT)/document/interface -name "*.md" | sort), make -s get_source_doc_header FILE=$(file);)
 	@echo "" >> readme.md
@@ -251,6 +257,7 @@ update_doc_list:
 create_all_docs:
 	@make -s clean_all_docs
 	@$(foreach file, $(shell find $(REPO_ROOT)/include/ -type f -name "*.*v*"), make -s gen_doc FILE=$(file) FOLDER=include;)
+	@$(foreach file, $(shell find $(REPO_ROOT)/assertion/ -type f -name "*.sv"), make -s gen_doc FILE=$(file) FOLDER=assertion;)
 	@$(foreach file, $(shell find $(REPO_ROOT)/interface/ -type f -name "*.sv"), make -s gen_doc FILE=$(file) FOLDER=interface;)
 	@$(foreach file, $(shell find $(REPO_ROOT)/source/ -type f -name "*.sv"), make -s gen_doc FILE=$(file) FOLDER=source;)
 
@@ -259,6 +266,7 @@ clean_all_docs:
 	@mkdir -p $(REPO_ROOT)/document/source
 	@rm -rf $(REPO_ROOT)/document/include
 	@rm -rf $(REPO_ROOT)/document/interface
+	@rm -rf $(REPO_ROOT)/document/assertion
 	@rm -f $(REPO_ROOT)/document/source/*.md
 	@rm -f $(REPO_ROOT)/document/source/*_top.svg
 
