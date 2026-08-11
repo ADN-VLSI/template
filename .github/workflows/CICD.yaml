@@ -21,7 +21,7 @@ jobs:
           KEY_1: ${{ secrets.FOEZ_API_KEY_1 }}
           KEY_2: ${{ secrets.FOEZ_API_KEY_2 }}
           KEY_3: ${{ secrets.FOEZ_API_KEY_3 }}
-          # KEY_4: ${{ secrets.FOEZ_API_KEY_4 }}
+          KEY_4: ${{ secrets.FOEZ_API_KEY_4 }}
           KEY_5: ${{ secrets.FOEZ_API_KEY_5 }}
           KEY_6: ${{ secrets.FOEZ_API_KEY_6 }}
           KEY_7: ${{ secrets.FOEZ_API_KEY_7 }}
@@ -29,8 +29,8 @@ jobs:
         run: |
           directive_regex='^[[:space:]]*(//|#|--|/\*+|\*+)?[[:space:]]*@foez-bhai\b'
           workflow_file="./.github/workflows/foez-bhai-tag.yml"
-          KEYS=("$KEY_0" "$KEY_1" "$KEY_2" "$KEY_3" "$KEY_5" "$KEY_6" "$KEY_7")
-          CURRENT_INDEX=$(( ${INDEX:-0} % 7 ))
+          KEYS=("$KEY_0" "$KEY_1" "$KEY_2" "$KEY_3" "$KEY_4" "$KEY_5" "$KEY_6" "$KEY_7")
+          CURRENT_INDEX=$(( ${INDEX:-0} % 8 ))
           mapfile -d '' files < <(
             grep -RIlZ --exclude-dir=.git --exclude-dir=.github --exclude-dir=document --exclude-dir=submodule -E "$directive_regex" . |
               while IFS= read -r -d '' file; do
@@ -49,7 +49,7 @@ jobs:
               mv output.foez "$file"
               echo "" >> "$file"
               rm -rf __pycache__
-              CURRENT_INDEX=$(( (CURRENT_INDEX + 1) % 7 ))
+              CURRENT_INDEX=$(( (CURRENT_INDEX + 1) % 8 ))
               gh variable set KEY_INDEX --body "$CURRENT_INDEX" --repo "${{ github.repository }}"
             done < tagged-files.txt
           fi
