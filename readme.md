@@ -30,7 +30,7 @@
 ## ASSERTION
 [`dummy_checker`](document/assertion/dummy_checker.md)
 
-[`dummy_checker`](https://github.com/ADN-VLSI/adn_common/blob/main/document/assertion/dummy_checker.md)
+[`https://github.com/ADN-VLSI/adn_common/blob/main/document/assertion/dummy_checker.md)
 
 ## INTERFACE
 [`dummy_interface`](document/interface/dummy_interface.md)
@@ -40,7 +40,7 @@
 ## INCLUDE
 [`dummy.svh`](document/include/dummy.md)
 
-[`assertion/valid_ready.svh`](https://github.com/ADN-VLSI/adn_common/blob/main/document/include/assertion/valid_ready.md)
+[`https://github.com/ADN-VLSI/adn_common/blob/main/document/include/assertion/valid_ready.md)
 [`pmi/assign.svh`](https://github.com/ADN-VLSI/adn_common/blob/main/document/include/pmi/assign.md)
 [`pmi/typedef.svh`](https://github.com/ADN-VLSI/adn_common/blob/main/document/include/pmi/typedef.md)
 [`vip/adn_common_tb_headers.sv`](https://github.com/ADN-VLSI/adn_common/blob/main/document/include/vip/adn_common_tb_headers.md)
