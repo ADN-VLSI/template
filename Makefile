@@ -73,6 +73,9 @@ help:
 	@echo -e "    \033[1;32m# Clean build directory\033[0m"
 	@echo -e "    \033[0;33mmake\033[0m \033[0;36mclean\033[0m"
 	@echo ""
+	@echo -e "    \033[1;32m# Create Assertion from Template\033[0m"
+	@echo -e "    \033[0;33mmake\033[0m \033[0;36mgen_assertion\033[0m RTL=\033[0;35m<assertion_module_name>\033[0m"
+	@echo ""
 	@echo -e "    \033[1;32m# Clean build, log and coverage directories\033[0m"
 	@echo -e "    \033[0;33mmake\033[0m \033[0;36mclean_full\033[0m"
 	@echo ""
@@ -296,6 +299,21 @@ endif
 ####################################################################################################
 # TESTBENCH & SOURCE GENERATION
 ####################################################################################################
+
+.PHONY: gen_assertion
+gen_assertion:
+# if file doesn't exist, generate it
+	@if [ ! -f $(REPO_ROOT)/assertion/$(RTL).sv ]; then \
+		echo -e "\033[1;33m#\033[0m Generating assertion for $(RTL)"; \
+		cp $(REPO_ROOT)/.github/source.sv $(REPO_ROOT)/assertion/$(RTL).sv; \
+		sed -i "s|__AUTHOR_NAME__|$$(git config user.name)|g" $(REPO_ROOT)/assertion/$(RTL).sv; \
+		sed -i "s|__AUTHOR_EMAIL__|$$(git config user.email)|g" $(REPO_ROOT)/assertion/$(RTL).sv; \
+		sed -i "s|YYYY-MM-DD|$$(date +%Y-%m-%d)|g" $(REPO_ROOT)/assertion/$(RTL).sv; \
+		sed -i "s|ADN-VLSI/__REPO_NAME__|ADN-VLSI/$(REPO_FILE_EXT)|g" $(REPO_ROOT)/assertion/$(RTL).sv; \
+		sed -i "s|__YEAR__|$$(date +%Y)|g" $(REPO_ROOT)/assertion/$(RTL).sv; \
+		sed -i "s|source_model|$(RTL)|g" $(REPO_ROOT)/assertion/$(RTL).sv; \
+	fi
+	@code $(REPO_ROOT)/assertion/$(RTL).sv
 
 .PHONY: gen_source
 gen_source:
