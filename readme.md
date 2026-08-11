@@ -30,16 +30,20 @@
 ## ASSERTION
 [`dummy_checker`](document/assertion/dummy_checker.md)
 
+[`adn_common_pipeline_assertion`](https://github.com/ADN-VLSI/adn_common/blob/main/document/assertion/adn_common_pipeline_assertion.md)
+[`adn_common_pipeline_join_assertion`](https://github.com/ADN-VLSI/adn_common/blob/main/document/assertion/adn_common_pipeline_join_assertion.md)
+[`adn_common_pipeline_split_assertion`](https://github.com/ADN-VLSI/adn_common/blob/main/document/assertion/adn_common_pipeline_split_assertion.md)
+[`adn_common_valid_ready_checker`](https://github.com/ADN-VLSI/adn_common/blob/main/document/assertion/adn_common_valid_ready_checker.md)
 
 ## INTERFACE
 [`dummy_interface`](document/interface/dummy_interface.md)
 
+[`adn_PMI`](https://github.com/ADN-VLSI/adn_common/blob/main/document/interface/adn_PMI.md)
 [`dummy_interface`](https://github.com/ADN-VLSI/adn_common/blob/main/document/interface/dummy_interface.md)
 
 ## INCLUDE
 [`dummy.svh`](document/include/dummy.md)
 
-[`https://github.com/ADN-VLSI/adn_common/blob/main/document/include/assertion/valid_ready.md)
 [`pmi/assign.svh`](https://github.com/ADN-VLSI/adn_common/blob/main/document/include/pmi/assign.md)
 [`pmi/typedef.svh`](https://github.com/ADN-VLSI/adn_common/blob/main/document/include/pmi/typedef.md)
 [`vip/adn_common_tb_headers.sv`](https://github.com/ADN-VLSI/adn_common/blob/main/document/include/vip/adn_common_tb_headers.md)
