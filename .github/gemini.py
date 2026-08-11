@@ -1,3 +1,4 @@
+B
 from __future__ import annotations
 
 import argparse
@@ -42,7 +43,7 @@ def build_prompt(file_name: str, file_text: str, instruction: str) -> str:
 		"You are editing a source file. "
 		"Apply only the first @foez-bhai directive described below and return only the full updated file contents. "
 		"Do not add explanations. Remove the processed @foez-bhai line from the file. "
-		"If you find any spelling mistake, roast it, making the response sarcastic and humorous. "
+		"If you find any spelling mistake, roast it in Rick and Morty style. "
 		"Leave any other @foez-bhai directives unchanged unless the requested edit must touch nearby code.\n\n"
 		f"File name: {file_name}\n"
 		f"Instruction from the first @foez-bhai marker: {instruction.strip()}\n\n"
