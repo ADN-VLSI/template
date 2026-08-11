@@ -218,6 +218,7 @@ regression:
 	@$(foreach f,$(wildcard wcfg/*.gtkw),sed -i 's#\\\\#/#g' "$(f)";)
 	@$(foreach f,$(wildcard wcfg/*.gtkw),sed -i 's|^\[dumpfile\] .*/build/|\[dumpfile\] "build/|' "$(f)";)
 	@$(foreach f,$(wildcard wcfg/*.gtkw),sed -i 's|^\[savefile\] .*/wcfg/|\[savefile\] "wcfg/|' "$(f)";)
+	@chmod 755 ./.github/regression.sh
 	@./.github/regression.sh
 
 ####################################################################################################
