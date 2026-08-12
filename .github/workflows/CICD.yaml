@@ -55,6 +55,11 @@ jobs:
           fi
           rm -rf tagged-files.txt
 
+      - name: Submodule Update
+        shell: bash
+        run: |
+          git submodule update --init --depth 1
+
       - name: Update Documentations & Lists
         shell: bash
         run: |
@@ -75,3 +80,5 @@ jobs:
         run: |
           touch ./log/ci_issues.log
           [[ -s ./log/ci_issues.log ]] && exit 1 || exit 0
+
+
