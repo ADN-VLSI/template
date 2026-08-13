@@ -55,10 +55,10 @@ help:
 	@echo -e "    \033[0;33mmake\033[0m \033[0;36mhelp\033[0m"
 	@echo ""
 	@echo -e "    \033[1;32m# Create Design Source from Template\033[0m"
-	@echo -e "    \033[0;33mmake\033[0m \033[0;36mgen_source\033[0m RTL=\033[0;35m<design_module_name>\033[0m"
+	@echo -e "    \033[0;33mmake\033[0m \033[0;36mgen_source\033[0m TOP=\033[0;35m<design_module_name>\033[0m"
 	@echo ""
 	@echo -e "    \033[1;32m# Create Testbench from Template\033[0m"
-	@echo -e "    \033[0;33mmake\033[0m \033[0;36mgen_testbench\033[0m RTL=\033[0;35m<top_module_name>\033[0m"
+	@echo -e "    \033[0;33mmake\033[0m \033[0;36mgen_testbench\033[0m TOP=\033[0;35m<top_module_name>\033[0m"
 	@echo ""
 	@echo -e "    \033[1;32m# Run simulation for a selected top module and test case, etc.\033[0m"
 	@echo -e "    \033[1;32m# The arguments are passed to the testbench to as follows:\033[0m"
@@ -73,8 +73,11 @@ help:
 	@echo -e "    \033[1;32m# Clean build directory\033[0m"
 	@echo -e "    \033[0;33mmake\033[0m \033[0;36mclean\033[0m"
 	@echo ""
+	@echo -e "    \033[1;32m# Create Interface from Template\033[0m"
+	@echo -e "    \033[0;33mmake\033[0m \033[0;36mgen_interface\033[0m TOP=\033[0;35m<interface_name>\033[0m"
+	@echo ""
 	@echo -e "    \033[1;32m# Create Assertion from Template\033[0m"
-	@echo -e "    \033[0;33mmake\033[0m \033[0;36mgen_assertion\033[0m RTL=\033[0;35m<assertion_module_name>\033[0m"
+	@echo -e "    \033[0;33mmake\033[0m \033[0;36mgen_assertion\033[0m TOP=\033[0;35m<assertion_module_name>\033[0m"
 	@echo ""
 	@echo -e "    \033[1;32m# Clean build, log and coverage directories\033[0m"
 	@echo -e "    \033[0;33mmake\033[0m \033[0;36mclean_full\033[0m"
@@ -128,7 +131,7 @@ $(BUILD_DIR)/XSIM_ARGS:
 ifeq ($(GUI), 0)
 	@echo "-runall" > $@
 else
-	@echo "-gui --autoloadwcfg --view $(REPO_ROOT)/wcfg/$(TOP).wcfg" > $@
+	@echo "-gui --autoloadwcfg --view $(REPO_ROOT)/wcfg/snap_$(TOP).wcfg" > $@
 endif
 	@echo "--testplusarg TN=$(TN)" >> $@
 	@echo "--testplusarg TC=$(TC)" >> $@
@@ -304,32 +307,47 @@ endif
 .PHONY: gen_assertion
 gen_assertion:
 # if file doesn't exist, generate it
-	@if [ ! -f $(REPO_ROOT)/assertion/$(RTL).sv ]; then \
-		echo -e "\033[1;33m#\033[0m Generating assertion for $(RTL)"; \
-		cp $(REPO_ROOT)/.github/source.sv $(REPO_ROOT)/assertion/$(RTL).sv; \
-		sed -i "s|__AUTHOR_NAME__|$$(git config user.name)|g" $(REPO_ROOT)/assertion/$(RTL).sv; \
-		sed -i "s|__AUTHOR_EMAIL__|$$(git config user.email)|g" $(REPO_ROOT)/assertion/$(RTL).sv; \
-		sed -i "s|YYYY-MM-DD|$$(date +%Y-%m-%d)|g" $(REPO_ROOT)/assertion/$(RTL).sv; \
-		sed -i "s|ADN-VLSI/__REPO_NAME__|ADN-VLSI/$(REPO_FILE_EXT)|g" $(REPO_ROOT)/assertion/$(RTL).sv; \
-		sed -i "s|__YEAR__|$$(date +%Y)|g" $(REPO_ROOT)/assertion/$(RTL).sv; \
-		sed -i "s|source_model|$(RTL)|g" $(REPO_ROOT)/assertion/$(RTL).sv; \
+	@if [ ! -f $(REPO_ROOT)/assertion/$(TOP).sv ]; then \
+		echo -e "\033[1;33m#\033[0m Generating assertion for $(TOP)"; \
+		cp $(REPO_ROOT)/.github/source.sv $(REPO_ROOT)/assertion/$(TOP).sv; \
+		sed -i "s|__AUTHOR_NAME__|$$(git config user.name)|g" $(REPO_ROOT)/assertion/$(TOP).sv; \
+		sed -i "s|__AUTHOR_EMAIL__|$$(git config user.email)|g" $(REPO_ROOT)/assertion/$(TOP).sv; \
+		sed -i "s|YYYY-MM-DD|$$(date +%Y-%m-%d)|g" $(REPO_ROOT)/assertion/$(TOP).sv; \
+		sed -i "s|ADN-VLSI/__REPO_NAME__|ADN-VLSI/$(REPO_FILE_EXT)|g" $(REPO_ROOT)/assertion/$(TOP).sv; \
+		sed -i "s|__YEAR__|$$(date +%Y)|g" $(REPO_ROOT)/assertion/$(TOP).sv; \
+		sed -i "s|source_model|$(TOP)|g" $(REPO_ROOT)/assertion/$(TOP).sv; \
 	fi
-	@code $(REPO_ROOT)/assertion/$(RTL).sv
+	@code $(REPO_ROOT)/assertion/$(TOP).sv
+
+.PHONY: gen_interface
+gen_interface:
+# if file doesn't exist, generate it
+	@if [ ! -f $(REPO_ROOT)/interface/$(TOP).sv ]; then \
+		echo -e "\033[1;33m#\033[0m Generating interface for $(TOP)"; \
+		cp $(REPO_ROOT)/.github/interface.sv $(REPO_ROOT)/interface/$(TOP).sv; \
+		sed -i "s|__AUTHOR_NAME__|$$(git config user.name)|g" $(REPO_ROOT)/interface/$(TOP).sv; \
+		sed -i "s|__AUTHOR_EMAIL__|$$(git config user.email)|g" $(REPO_ROOT)/interface/$(TOP).sv; \
+		sed -i "s|YYYY-MM-DD|$$(date +%Y-%m-%d)|g" $(REPO_ROOT)/interface/$(TOP).sv; \
+		sed -i "s|ADN-VLSI/__REPO_NAME__|ADN-VLSI/$(REPO_FILE_EXT)|g" $(REPO_ROOT)/interface/$(TOP).sv; \
+		sed -i "s|__YEAR__|$$(date +%Y)|g" $(REPO_ROOT)/interface/$(TOP).sv; \
+		sed -i "s|source_model|$(TOP)|g" $(REPO_ROOT)/interface/$(TOP).sv; \
+	fi
+	@code $(REPO_ROOT)/interface/$(TOP).sv
 
 .PHONY: gen_source
 gen_source:
 # if file doesn't exist, generate it
-	@if [ ! -f $(REPO_ROOT)/source/$(RTL).sv ]; then \
-		echo -e "\033[1;33m#\033[0m Generating source for $(RTL)"; \
-		cp $(REPO_ROOT)/.github/source.sv $(REPO_ROOT)/source/$(RTL).sv; \
-		sed -i "s|__AUTHOR_NAME__|$$(git config user.name)|g" $(REPO_ROOT)/source/$(RTL).sv; \
-		sed -i "s|__AUTHOR_EMAIL__|$$(git config user.email)|g" $(REPO_ROOT)/source/$(RTL).sv; \
-		sed -i "s|YYYY-MM-DD|$$(date +%Y-%m-%d)|g" $(REPO_ROOT)/source/$(RTL).sv; \
-		sed -i "s|ADN-VLSI/__REPO_NAME__|ADN-VLSI/$(REPO_FILE_EXT)|g" $(REPO_ROOT)/source/$(RTL).sv; \
-		sed -i "s|__YEAR__|$$(date +%Y)|g" $(REPO_ROOT)/source/$(RTL).sv; \
-		sed -i "s|source_model|$(RTL)|g" $(REPO_ROOT)/source/$(RTL).sv; \
+	@if [ ! -f $(REPO_ROOT)/source/$(TOP).sv ]; then \
+		echo -e "\033[1;33m#\033[0m Generating source for $(TOP)"; \
+		cp $(REPO_ROOT)/.github/source.sv $(REPO_ROOT)/source/$(TOP).sv; \
+		sed -i "s|__AUTHOR_NAME__|$$(git config user.name)|g" $(REPO_ROOT)/source/$(TOP).sv; \
+		sed -i "s|__AUTHOR_EMAIL__|$$(git config user.email)|g" $(REPO_ROOT)/source/$(TOP).sv; \
+		sed -i "s|YYYY-MM-DD|$$(date +%Y-%m-%d)|g" $(REPO_ROOT)/source/$(TOP).sv; \
+		sed -i "s|ADN-VLSI/__REPO_NAME__|ADN-VLSI/$(REPO_FILE_EXT)|g" $(REPO_ROOT)/source/$(TOP).sv; \
+		sed -i "s|__YEAR__|$$(date +%Y)|g" $(REPO_ROOT)/source/$(TOP).sv; \
+		sed -i "s|source_model|$(TOP)|g" $(REPO_ROOT)/source/$(TOP).sv; \
 	fi
-	@code $(REPO_ROOT)/source/$(RTL).sv
+	@code $(REPO_ROOT)/source/$(TOP).sv
 
 .PHONY: gen_testbench
 gen_testbench:
