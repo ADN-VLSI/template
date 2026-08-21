@@ -58,7 +58,7 @@ jobs:
       - name: Submodule Update
         shell: bash
         run: |
-          git submodule update --init --depth 1
+          git submodule update --init --depth 1 || true
 
       - name: Update Documentations & Lists
         shell: bash
