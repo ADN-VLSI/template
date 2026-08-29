@@ -20,6 +20,7 @@
 [`adn_common_pipeline_join`](https://github.com/ADN-VLSI/adn_common/blob/main/document/source/adn_common_pipeline_join.md)
 [`adn_common_pipeline`](https://github.com/ADN-VLSI/adn_common/blob/main/document/source/adn_common_pipeline.md)
 [`adn_common_pipeline_split`](https://github.com/ADN-VLSI/adn_common/blob/main/document/source/adn_common_pipeline_split.md)
+[`adn_common_pmi_width_converter_down`](https://github.com/ADN-VLSI/adn_common/blob/main/document/source/adn_common_pmi_width_converter_down.md)
 [`adn_common_priority_encoder`](https://github.com/ADN-VLSI/adn_common/blob/main/document/source/adn_common_priority_encoder.md)
 [`adn_common_range_checker`](https://github.com/ADN-VLSI/adn_common/blob/main/document/source/adn_common_range_checker.md)
 [`adn_common_ring_counter`](https://github.com/ADN-VLSI/adn_common/blob/main/document/source/adn_common_ring_counter.md)
