@@ -21,6 +21,7 @@ TC    := 0
 VCD   := 0
 DEBUG := 0
 GUI   := 0
+COV   := 0
 
 ####################################################################################################
 # Tools
@@ -29,6 +30,7 @@ GUI   := 0
 XVLOG  ?= xvlog
 XELAB  ?= xelab
 XSIM   ?= xsim
+XCRG   ?= xcrg
 PYTHON ?= python
 
 ####################################################################################################
@@ -193,10 +195,17 @@ simulate:
 	@make -s __ENV_BUILD__ TOP=$(TOP)
 	@make -s $(BUILD_DIR)/XSIM_ARGS GUI=$(GUI) TN=$(TN) TC=$(TC) VCD=$(VCD) DEBUG=$(DEBUG)
 	@echo -e "\033[1;33m#\033[0m Simulating TOP:$(TOP) Test:$(TN) Count:$(TC)"
-	@cd $(BUILD_DIR) && $(XSIM) snap_$(TOP) -f $(BUILD_DIR)/XSIM_ARGS -log $(LOG_DIR)/xsim_$(TOP)_$(TN)_$(shell date +%Y%m%d_%H%M%S).log $(H_EW)
+	@cd $(BUILD_DIR) && $(XSIM) snap_$(TOP) -f $(BUILD_DIR)/XSIM_ARGS --cov_db_name ${TOP} -log $(LOG_DIR)/xsim_$(TOP)_$(TN)_$(shell date +%Y%m%d_%H%M%S).log $(H_EW)
 ifneq ($(VCD), 0)
 	@echo -e "\033[1;33m#\033[0m Loading VCD waveform file"
 	@gtkwave $(REPO_ROOT)/wcfg/$(TOP).gtkw || gtkwave $(BUILD_DIR)/$(TOP).vcd
+endif
+ifneq ($(COV), 0)
+	@echo -e "\033[1;33m#\033[0m Generating coverage results"
+	@make -s $(REPORT_DIR)
+	@cd $(BUILD_DIR) && $(XCRG) -report_format html --cov_db_name ${TOP} --log ${LOG_DIR}/xcrg_$(TOP)_$(TN)_$(shell date +%Y%m%d_%H%M%S).log $(O_EW)
+	@mv ${BUILD_DIR}/xsim_coverage_report/functionalCoverageReport $(REPORT_DIR)/$(TOP)_$(TN)_$(shell date +%Y%m%d_%H%M%S)
+	@echo "$(REPORT_DIR)/$(TOP)_$(TN)_$(shell date +%Y%m%d_%H%M%S)/dashboard.html"
 endif
 
 .PHONY: compile_submodule

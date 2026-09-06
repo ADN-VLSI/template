@@ -16,7 +16,7 @@ ci_simulate () {
   # Print a timestamped, colored status message (yellow) without newline
   echo -n -e " $(date +%x\ %H:%M:%S) - \033[1;33mSIMULATING TB:$1 TN:$2 TC:$3\033[0m"
   # Run the make simulate target quietly. STDERR/STDOUT are redirected to /dev/null
-  make -s simulate TOP=$1 TN=$2 TC=$3 DEBUG=0 GUI=0 VCD=0 > /dev/null 2>&1
+  make -s simulate TOP=$1 TN=$2 TC=$3 DEBUG=0 GUI=0 VCD=0 COV=0 > /dev/null 2>&1
   end_time=$(date +%s)
   time_diff=$((end_time - start_time))
   # Print Done in green with elapsed time
