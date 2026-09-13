@@ -70,6 +70,7 @@ help:
 	@echo -e "    \033[0;32m#   VCD   : int    vcd;          // GENERATE VCD FILE\033[0m"
 	@echo -e "    \033[0;32m#   DEBUG : int    debug;        // ENABLE DEBUG MODE\033[0m"
 	@echo -e "    \033[1;32m# GUI : Run simulation in GUI mode\033[0m"
+	@echo -e "    \033[1;32m# COV : Generate coverage report\033[0m"
 	@echo -e "    \033[0;33mmake\033[0m \033[0;36msimulate\033[0m TOP=\033[0;35m<top_module_name>\033[0m TN=\033[0;35m<test_case_name>\033[0m TC=\033[0;35m<int>\033[0m VCD=\033[0;35m<int>\033[0m DEBUG=\033[0;35m<int>\033[0m GUI=\033[0;35m<0|1>\033[0m"
 	@echo ""
 	@echo -e "    \033[1;32m# Clean build directory\033[0m"
