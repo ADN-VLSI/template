@@ -37,8 +37,10 @@ PYTHON ?= python
 # Macros
 ####################################################################################################
 
-O_EW :=  | (grep -iE "Error|Warning" --color=auto || true)
-H_EW :=  | (grep -iE "Error|Warning|" --color=auto)
+STCR := | sed "/For covergroup Instance 'test_report' of covergroup/d"
+
+O_EW :=  $(STCR) | (grep -iE "Error|Warning" --color=auto || true)
+H_EW :=  $(STCR) | (grep -iE "Error|Warning|" --color=auto)
 
 LINE_1 := This file is part of https://github.com/ADN-VLSI/$(REPO_FILE_EXT)
 LINE_2 := Copyright (c) $(shell date +%Y) ADN Semiconductors
@@ -197,6 +199,7 @@ simulate:
 	@make -s $(BUILD_DIR)/XSIM_ARGS GUI=$(GUI) TN=$(TN) TC=$(TC) VCD=$(VCD) DEBUG=$(DEBUG)
 	@echo -e "\033[1;33m#\033[0m Simulating TOP:$(TOP) Test:$(TN) Count:$(TC)"
 	@cd $(BUILD_DIR) && $(XSIM) snap_$(TOP) -f $(BUILD_DIR)/XSIM_ARGS --cov_db_name ${TOP} -log $(LOG_DIR)/xsim_$(TOP)_$(TN)_$(shell date +%Y%m%d_%H%M%S).log $(H_EW)
+	@sed -i "/For covergroup Instance 'test_report' of covergroup/d" $(LOG_DIR)/xsim_$(TOP)_$(TN)_$(shell date +%Y%m%d_%H%M%S).log
 ifneq ($(VCD), 0)
 	@echo -e "\033[1;33m#\033[0m Loading VCD waveform file"
 	@gtkwave $(REPO_ROOT)/wcfg/$(TOP).gtkw || gtkwave $(BUILD_DIR)/$(TOP).vcd
